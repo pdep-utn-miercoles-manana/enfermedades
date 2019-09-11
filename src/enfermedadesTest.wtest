@@ -1,0 +1,81 @@
+import enfermedades.*
+
+describe "Enfermedades" {
+
+	var frank
+	var logan
+	var malaria500 
+	var malaria800
+	var otitis 
+	var lupus
+ 	var cameron 
+	
+	fixture {
+		frank = new Persona()
+		logan = new Persona()
+		cameron = new Medicx()
+		
+		malaria500 = new EnfermedadInfecciosa()
+		malaria800 = new EnfermedadInfecciosa()
+		otitis = new EnfermedadInfecciosa()
+		lupus = new EnfermedadAutoinmune()
+		
+		malaria500.cantidadCelulasAmenazadas(500)
+		malaria800.cantidadCelulasAmenazadas(800)
+		otitis.cantidadCelulasAmenazadas(100)		
+		lupus.cantidadCelulasAmenazadas(10000)
+
+		logan.contraerEnfermedad(malaria500)
+		logan.contraerEnfermedad(otitis)
+		logan.contraerEnfermedad(lupus)
+		
+		frank.temperatura(36)
+		logan.temperatura(36)
+
+		frank.cantidadCelulas(3500000)
+		logan.cantidadCelulas(3000000)
+	}
+
+	test "PUNTO 1 - Frank sabe contraer enfermedades" {
+		frank.contraerEnfermedad(malaria800)
+		assert.that(frank.contrajo(malaria800))
+	}
+	
+	test "PUNTO 2 - La malaria se sabe reproducir" {	
+		malaria500.reproducirse()
+		assert.equals(1000, malaria500.cantidadCelulasAmenazadas())
+	}
+	
+	test "PUNTO 3 - Logan vive un día y pierde tempreratura" {
+		logan.vivirUnDia()
+		assert.equals(36.6, logan.temperatura())
+	}
+
+	test "PUNTO 3 - Logan vive un día y pierde cantidad de células" {
+		logan.vivirUnDia()
+		assert.equals(2990000, logan.cantidadCelulas())
+	}
+	
+	test "PUNTO 4 - A - Cantidad celulas amenzadas por enfermedades agresivas" {
+		assert.equals(0, logan.cantidadCelulasAmenazadasPorEnfermedadesAgresivas())
+	}
+
+
+	// ------------//
+	// TEMPORADA 2 //
+	// ------------//
+		
+	test "cameron atienda a logan" {
+		cameron.dosis(10)
+		cameron.atenderA(logan)
+		assert.equals(350, malaria500.cantidadCelulasAmenazadas())
+	}
+		
+}
+
+
+
+
+
+
+
