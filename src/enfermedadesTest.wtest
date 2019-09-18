@@ -6,19 +6,26 @@ describe "Enfermedades" {
 	var logan
 	var malaria500 
 	var malaria800
+	var malaria1000 
 	var otitis 
 	var lupus
- 	var cameron 
+ 	var cameron
+ 	var foreman
+ 	var house
+ 	var transfusion
 	
 	fixture {
 		malaria500 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 500)
 		malaria800 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 800)
+		malaria1000 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 1000)
 		otitis = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 100)
 		lupus = new EnfermedadAutoinmune(cantidadCelulasAmenazadas = 10000)
 		
 		frank = new Persona(temperatura = 36, cantidadCelulas = 3500000)
 		logan = new Persona(cantidadCelulas = 3000000, temperatura = 36)
-		cameron = new Medicx(cantidadCelulas = 3000000, temperatura = 36, dosis = 10)
+		cameron = new Medicx(cantidadCelulas = 3000000, temperatura = 36, dosis = 10, enfermedades = #{malaria1000})
+		foreman = new Medicx(cantidadCelulas = 3000000, temperatura = 36, dosis = 20)
+		house = new JefeDeDepartamento(cantidadCelulas = 3000000, temperatura = 36, subordinados = #{foreman})
 		
 		logan.contraerEnfermedad(malaria500)
 		logan.contraerEnfermedad(otitis)
@@ -66,22 +73,55 @@ describe "Enfermedades" {
 	// TEMPORADA 2 //
 	// ------------//
 
-    test "cameron atienda a logan" {
+    test "PUNTO 1 - A - La malaria se atenúa 100 células" {
+    	malaria500.atenuarEn(100)
+		assert.equals(400, malaria500.cantidadCelulasAmenazadas())
+	}
+	
+    test "PUNTO 1 - B - El lupus se atenúa 500 células" {
+    	lupus.atenuarEn(500)
+		assert.equals(9500, lupus.cantidadCelulasAmenazadas())
+	}
+	
+    test "PUNTO 2 - Cameron atienda a Logan" {
 		cameron.atenderA(logan)
 		assert.equals(350, malaria500.cantidadCelulasAmenazadas())
+	}
+	
+    test "PUNTO 3 - House atiende a Cameron" {
+		house.atenderA(cameron)
+		assert.equals(700, malaria1000.cantidadCelulasAmenazadas())
 	}
 	
 	// ------------//
 	// TEMPORADA 3 //
 	// ------------//
 
-	test "rompe todo al donar" {
-		logan = new Persona(temperatura = 36, cantidadCelulas = 1000)
-		var transfusion = new Transfusion(donante = logan, receptor = frank, cantidadDeCelulas = 500)
-		assert.throwsExceptionLike(
-			new TransfusionException(message = "El donante no puede donar!!"), 
-			{ transfusion.realizar() }
-		)
+	test "PUNTO 1 - Cameron intente donar a House 1100 células" {
+		cameron = new Persona(cantidadCelulas = 4000, temperatura = 36, factorSanguineo = factorA)
+		house = new Persona(cantidadCelulas = 4000, temperatura = 36, factorSanguineo = factorO)
+		
+		transfusion = new Transfusion(donante = cameron, receptor = house, cantidadDeCelulas = 1100)
+		
+		assert.throwsExceptionWithMessage("El donante no puede donar!!", { transfusion.realizar() })
+	}
+		
+	test "PUNTO 2 - Logan intenta donarle a Foreman el máximo que puede donar" {
+		logan = new Persona(temperatura = 36, cantidadCelulas = 1000, factorSanguineo = factorR)
+		foreman = new Persona(temperatura = 36, cantidadCelulas = 1000, factorSanguineo = factorA)
+		
+		transfusion = new Transfusion(donante = logan, receptor = foreman, cantidadDeCelulas = logan.maximoATransferir())
+				
+		assert.throwsExceptionWithMessage("El donante no puede donar!!", { transfusion.realizar() })
+	}
+		
+	test "PUNTO 3 - Foreman intenta donar a Cameron 300 células" {
+		foreman = new Persona(temperatura = 36, cantidadCelulas = 1000, factorSanguineo = factorA)
+		cameron = new Persona(cantidadCelulas = 4000, temperatura = 36, factorSanguineo = factorA)
+		
+		transfusion = new Transfusion(donante = foreman, receptor = cameron, cantidadDeCelulas = 300)
+				
+		assert.throwsExceptionWithMessage("El donante no puede donar!!", { transfusion.realizar() })
 	}
 		
 }

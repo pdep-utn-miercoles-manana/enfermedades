@@ -2,6 +2,7 @@ class Persona {
 	var enfermedades = #{}
 	var temperatura
 	var cantidadCelulas
+	var factorSanguineo = factorO
 	
 	method contraerEnfermedad(unaEnfermedad) {
 		enfermedades.add(unaEnfermedad)
@@ -50,9 +51,17 @@ class Persona {
 	}
 
 	method puedeDonar(unasCelulas) {
-		return unasCelulas > 500 && unasCelulas <= cantidadCelulas / 4
+		return unasCelulas > 500 && unasCelulas <= self.maximoATransferir()
 	}
 
+	method esCompatibleCon(unaPersona) {
+		return factorSanguineo.puedeDonar(unaPersona.factorSanguineo()) && unaPersona.factorSanguineo().puedeRecibirDe(self.factorSanguineo())
+	}
+
+	method maximoATransferir() {
+		return cantidadCelulas / 4	
+	}
+	
 	method enfermedadQueMasCelulasAfecte() {
 		return enfermedades.max { enfermedad => enfermedad.cantidadCelulasAmenazadas() }
 	}
@@ -66,6 +75,7 @@ class Persona {
 	method temperatura() = temperatura
 	method enfermedades() = enfermedades
 	method cantidadCelulas() = cantidadCelulas
+	method factorSanguineo() = factorSanguineo
 }
 
 class Enfermedad {
@@ -117,7 +127,7 @@ class EnfermedadAutoinmune inherits Enfermedad {
 }
 
 class Medicx inherits Persona {
-	var dosis = 678
+	var dosis = 0
 	
 	method atenderA(unaPersona) {
 		unaPersona.aplicarDosis(dosis)
@@ -159,10 +169,40 @@ class Transfusion {
 
 	method validarCompatibilidad() {
 		if (donante.esCompatibleCon(receptor).negate()) {
-			throw new TransfusionException(message = "No son compatibles")
+			throw new TransfusionException(message = "Donante y receptor no son compatibles")
 		}
 	}
 
 }
 
 class TransfusionException inherits Exception {}
+
+object factorA {
+	method puedeDonarA(otroFactor) {
+		return otroFactor.equals(self) || otroFactor.equals(factorR) 	
+	}
+
+	method puedeRecibirDe(otroFactor) {
+		return otroFactor.equals(self) || otroFactor.equals(factorO) 	
+	}
+}
+
+object factorR {
+	method puedeDonarA(otroFactor) {
+		return otroFactor.equals(self) 	
+	}
+
+	method puedeRecibirDe(otroFactor) {
+		return true	
+	}	
+}
+
+object factorO {
+	method puedeDonarA(otroFactor) {
+		return true 	
+	}
+
+	method puedeRecibirDe(otroFactor) {
+		return otroFactor.equals(factorA)
+	}	
+}
