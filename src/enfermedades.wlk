@@ -24,15 +24,11 @@ class Persona {
 	}
 	
 	method cantidadCelulasAmenazadasPorEnfermedadesAgresivas() {
-		return self.enfermedadesAgresivas().sum { enfermedad => 
-			enfermedad.cantidadCelulasAmenazadas()
-		}
+		return self.enfermedadesAgresivas().sum { enfermedad => enfermedad.cantidadCelulasAmenazadas() }
 	}
 	
 	method enfermedadesAgresivas() {
-		return enfermedades.filter { enfermedad => 
-			enfermedad.esAgresiva(cantidadCelulas)
-		}
+		return enfermedades.filter { enfermedad => enfermedad.esAgresiva(cantidadCelulas) }
 	}
 	
 	method aplicarDosis(unaDosis) {
@@ -45,10 +41,31 @@ class Persona {
 		enfermedades.remove(unaEnfermedad)
 	}
 	
+	method donar(unasCelulas) {
+		self.destruirCelulas(unasCelulas)
+	}
+
+	method recibir(unasCelulas) {
+		cantidadCelulas += unasCelulas
+	}
+
+	method puedeDonar(unasCelulas) {
+		return unasCelulas > 500 && unasCelulas <= cantidadCelulas / 4
+	}
+
+	method enfermedadQueMasCelulasAfecte() {
+		return enfermedades.max { enfermedad => enfermedad.cantidadCelulasAmenazadas() }
+	}
+
+	method estaEnComa() {
+		return temperatura == 45 || cantidadCelulas < 1000000
+	}
+
+	// Esta es una sintaxis copada que se puede usar en wollok cuando necesitas retornar algo en una sola línea
+
 	method temperatura() = temperatura
-	method cantidadCelulas() = cantidadCelulas
 	method enfermedades() = enfermedades
-	
+	method cantidadCelulas() = cantidadCelulas
 }
 
 class Enfermedad {
@@ -67,7 +84,6 @@ class Enfermedad {
 			unaPersona.curarse(self)
 		}
 	}
-	
 }
 
 
@@ -123,14 +139,30 @@ class JefeDeDepartamento inherits Medicx {
 	}
 }
 
+class Transfusion {
+	var donante
+	var receptor
+	var cantidadDeCelulas
 
+	method realizar() {
+		self.validarDonante()
+		self.validarCompatibilidad()
+		donante.donar(cantidadDeCelulas)
+		receptor.recibir(cantidadDeCelulas)
+	}
 
+	method validarDonante() {
+		if (donante.puedeDonar(cantidadDeCelulas).negate()) {
+			throw new TransfusionException(message = "El donante no puede donar!!")
+		}
+	}
 
+	method validarCompatibilidad() {
+		if (donante.esCompatibleCon(receptor).negate()) {
+			throw new TransfusionException(message = "No son compatibles")
+		}
+	}
 
+}
 
-
-
-
-
-
-
+class TransfusionException inherits Exception {}

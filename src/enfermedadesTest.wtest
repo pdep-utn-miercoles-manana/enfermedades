@@ -18,7 +18,7 @@ describe "Enfermedades" {
 		
 		frank = new Persona(temperatura = 36, cantidadCelulas = 3500000)
 		logan = new Persona(cantidadCelulas = 3000000, temperatura = 36)
-		cameron = new Medicx(cantidadCelulas = 3000000, temperatura = 36)
+		cameron = new Medicx(cantidadCelulas = 3000000, temperatura = 36, dosis = 10)
 		
 		logan.contraerEnfermedad(malaria500)
 		logan.contraerEnfermedad(otitis)
@@ -49,14 +49,39 @@ describe "Enfermedades" {
 		assert.equals(0, logan.cantidadCelulasAmenazadasPorEnfermedadesAgresivas())
 	}
 
+	test "PUNTO 4 - B - Enfermedad de Logan que más células afecte" {
+		assert.equals(lupus, logan.enfermedadQueMasCelulasAfecte())
+	}
+
+	test "PUNTO 4 - C - Logan sí está en coma" {
+		logan = new Persona(temperatura = 45, cantidadCelulas = 999999)
+		assert.that(logan.estaEnComa())
+	}
+
+	test "PUNTO 4 - C - Logan no está en coma" {
+		assert.notThat(logan.estaEnComa())
+	}
 
 	// ------------//
 	// TEMPORADA 2 //
 	// ------------//
-		
-	test "cameron atienda a logan" {
+
+    test "cameron atienda a logan" {
 		cameron.atenderA(logan)
 		assert.equals(350, malaria500.cantidadCelulasAmenazadas())
+	}
+	
+	// ------------//
+	// TEMPORADA 3 //
+	// ------------//
+
+	test "rompe todo al donar" {
+		logan = new Persona(temperatura = 36, cantidadCelulas = 1000)
+		var transfusion = new Transfusion(donante = logan, receptor = frank, cantidadDeCelulas = 500)
+		assert.throwsExceptionLike(
+			new TransfusionException(message = "El donante no puede donar!!"), 
+			{ transfusion.realizar() }
+		)
 	}
 		
 }
