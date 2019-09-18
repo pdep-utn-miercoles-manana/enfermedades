@@ -11,29 +11,18 @@ describe "Enfermedades" {
  	var cameron 
 	
 	fixture {
-		frank = new Persona()
-		logan = new Persona()
-		cameron = new Medicx()
+		malaria500 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 500)
+		malaria800 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 800)
+		otitis = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 100)
+		lupus = new EnfermedadAutoinmune(cantidadCelulasAmenazadas = 10000)
 		
-		malaria500 = new EnfermedadInfecciosa()
-		malaria800 = new EnfermedadInfecciosa()
-		otitis = new EnfermedadInfecciosa()
-		lupus = new EnfermedadAutoinmune()
+		frank = new Persona(temperatura = 36, cantidadCelulas = 3500000)
+		logan = new Persona(cantidadCelulas = 3000000, temperatura = 36)
+		cameron = new Medicx(cantidadCelulas = 3000000, temperatura = 36)
 		
-		malaria500.cantidadCelulasAmenazadas(500)
-		malaria800.cantidadCelulasAmenazadas(800)
-		otitis.cantidadCelulasAmenazadas(100)		
-		lupus.cantidadCelulasAmenazadas(10000)
-
 		logan.contraerEnfermedad(malaria500)
 		logan.contraerEnfermedad(otitis)
 		logan.contraerEnfermedad(lupus)
-		
-		frank.temperatura(36)
-		logan.temperatura(36)
-
-		frank.cantidadCelulas(3500000)
-		logan.cantidadCelulas(3000000)
 	}
 
 	test "PUNTO 1 - Frank sabe contraer enfermedades" {
@@ -66,7 +55,6 @@ describe "Enfermedades" {
 	// ------------//
 		
 	test "cameron atienda a logan" {
-		cameron.dosis(10)
 		cameron.atenderA(logan)
 		assert.equals(350, malaria500.cantidadCelulasAmenazadas())
 	}
